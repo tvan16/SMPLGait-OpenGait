@@ -93,7 +93,6 @@ You need at least **one GPU**; `nproc_per_node` should match the number of GPUs 
 
 ## Appendix: other configs in this folder
 
-- **`smplgait_gait3d.yaml`** — **Gait3D** benchmark template (upstream).
-- **`smplgait_gait3d_parsing.yaml`** — Gait3D with **parsing**.
+- **`smplgait_gait3d_parsing.yaml`** — optional **Gait3D + parsing** benchmark template from upstream (only if you use that dataset).
 
 See also [docs/2.prepare_dataset.md](../../docs/2.prepare_dataset.md).
