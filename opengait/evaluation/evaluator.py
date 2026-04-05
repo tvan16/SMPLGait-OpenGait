@@ -253,6 +253,58 @@ def evaluate_segmentation(data, dataset):
     return {"scalar/test_accuracy/mIOU": miou}
 
 
+def evaluate_simple(data, dataset, metric='euc', probe_view_substring='seq00'):
+    """
+    Đánh giá tập custom (JSON TRAIN_SET/TEST_SET, cấu trúc id/cam/seq):
+    probe = các sequence có `view` chứa probe_view_substring (mặc định seq00),
+    gallery = các sequence còn lại.
+    """
+    msg_mgr = get_msg_mgr()
+    features = data['embeddings']
+    labels = np.asarray(data['labels'])
+    views = np.asarray(data['views'])
+
+    probe_mask = np.array([probe_view_substring in str(v) for v in views])
+    if not np.any(probe_mask):
+        uniq = sorted(np.unique(views))
+        if len(uniq) == 0:
+            msg_mgr.log_warning('evaluate_simple: no samples.')
+            return {}
+        probe_mask = views == uniq[0]
+        msg_mgr.log_info(
+            'evaluate_simple: no view matching %r, use first view %r as probe.'
+            % (probe_view_substring, uniq[0])
+        )
+
+    probe_features = features[probe_mask]
+    gallery_features = features[~probe_mask]
+    probe_lbls = labels[probe_mask]
+    gallery_lbls = labels[~probe_mask]
+
+    if len(gallery_features) == 0:
+        msg_mgr.log_warning(
+            'evaluate_simple: gallery rỗng (chỉ một loại view?). Bỏ qua metric.'
+        )
+        return {}
+
+    msg_mgr.log_info(
+        'evaluate_simple: probe=%d, gallery=%d, metric=%s'
+        % (len(probe_lbls), len(gallery_lbls), metric)
+    )
+    dist = cuda_dist(probe_features, gallery_features, metric).cpu().numpy()
+    cmc, all_AP, all_INP = evaluate_rank(dist, probe_lbls, gallery_lbls)
+
+    mAP = np.mean(all_AP)
+    mINP = np.mean(all_INP)
+    results = {}
+    for r in [1, 5, 10]:
+        results['scalar/test_accuracy/Rank-{}'.format(r)] = cmc[r - 1] * 100
+    results['scalar/test_accuracy/mAP'] = mAP * 100
+    results['scalar/test_accuracy/mINP'] = mINP * 100
+    msg_mgr.log_info(results)
+    return results
+
+
 def evaluate_Gait3D(data, dataset, metric='euc'):
     msg_mgr = get_msg_mgr()
 

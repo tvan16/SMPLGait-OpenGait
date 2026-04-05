@@ -1,5 +1,6 @@
 import copy
 import os
+from pathlib import Path
 import inspect
 import logging
 import torch
@@ -138,7 +139,12 @@ def clones(module, N):
 def config_loader(path):
     with open(path, 'r') as stream:
         src_cfgs = yaml.safe_load(stream)
-    with open("./configs/default.yaml", 'r') as stream:
+    # default.yaml nằm ở <repo>/configs/ (không phải opengait/configs); cwd có thể là opengait/
+    repo_root = Path(__file__).resolve().parent.parent.parent
+    default_path = repo_root / "configs" / "default.yaml"
+    if not default_path.is_file():
+        default_path = Path("./configs/default.yaml")
+    with open(default_path, 'r') as stream:
         dst_cfgs = yaml.safe_load(stream)
     MergeCfgsDict(src_cfgs, dst_cfgs)
     return dst_cfgs

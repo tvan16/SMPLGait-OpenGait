@@ -9,6 +9,14 @@ __pycache__/
 # checkpoint
 *.pt
 
+# Inference / run outputs (logs, exports)
+output/
+
+# Local large data & checkpoints (custom SMPLGait / Data-PTIT pipeline)
+datasets/Data-PTIT/
+smpl_model_data/
+work/
+
 # summary
 events.out.tfevents.*
 # cache

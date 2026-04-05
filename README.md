@@ -79,6 +79,7 @@ See [here](https://github.com/jdyjjj/All-in-One-Gait) for details.
 
 
 Please see [0.get_started.md](docs/0.get_started.md). We also provide the following tutorials for your reference:
+- [SMPLGait — custom data & inference (videos, ROMP, sil, test)](configs/smplgait/README.md)
 - [Prepare dataset](docs/2.prepare_dataset.md)
 - [Detailed configuration](docs/3.detailed_config.md)
 - [Customize model](docs/4.how_to_create_your_model.md)
